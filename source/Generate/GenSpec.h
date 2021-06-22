@@ -2,6 +2,8 @@
 
 #include "Spec/Type.h"
 
+#include <JCGenCore.h>
+
 #include <string>
 #include <vector>
 
@@ -9,8 +11,7 @@ namespace PROJECT_NAMESPACE
 {
 	struct SerialFormat;
 
-
-
+#if false
 	struct IncludeSpec
 	{
 		enum IncludeType : int
@@ -21,11 +22,6 @@ namespace PROJECT_NAMESPACE
 
 		std::string name;
 		IncludeType type;
-	};
-
-	struct SerialSpec
-	{
-		std::vector<SerialFormat*> formats;
 	};
 
 	struct VariableSpec
@@ -57,6 +53,17 @@ namespace PROJECT_NAMESPACE
 		std::vector<FunctionSpec> functions{};
 	};
 
+	struct ForwardDeclSpec
+	{
+		std::string type;
+	};
+#endif
+
+	struct SerialSpec
+	{
+		std::vector<SerialFormat*> formats;
+	};
+
 	struct GenerationSpec
 	{
 		std::vector<IncludeSpec> include{};
@@ -65,11 +72,6 @@ namespace PROJECT_NAMESPACE
 		SerialSpec serial{};
 
 		TypeDefLedger typedefs;
-	};
-
-	struct ForwardDeclSpec
-	{
-		std::string type;
 	};
 
 };

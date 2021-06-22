@@ -1,19 +1,11 @@
 #pragma once
 
+#include <JCGenCore.h>
+
 #include <ranges>
 #include <vector>
 #include <filesystem>
 #include <memory>
-
-/*
-	Raw Input (XML, Lua, ...)
-		-> parsed
-	Input Specification
-		-> processed
-	Generation Specification
-		-> generated
-	Final Output (C++)
-*/
 
 namespace PROJECT_NAMESPACE
 {
@@ -57,6 +49,12 @@ namespace PROJECT_NAMESPACE
 	
 	result<GenerationSpecHandle> parse_xml(path _input);
 	result<GenerationSpecHandle> parse_lua(path _input);
+
+
+	
+	bool load_serial_format(std::unique_ptr<SerialFormat> _format);
+
+
 
 	error generate(const GenerationSpec& _spec, path _output);
 
