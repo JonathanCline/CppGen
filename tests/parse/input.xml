@@ -1,0 +1,15 @@
+<data>
+	<serial>
+		<xml/>
+	</serial>
+	
+	<include external="false">CppGen.h</include>
+	<include external="true">string</include>
+
+	<define name="building">
+		<var name="price" type="int">1000</var>
+		<var name="texture" type="std::string"></var>
+		<var name="height" type="int">16</var>
+	</define>
+	
+</data>
