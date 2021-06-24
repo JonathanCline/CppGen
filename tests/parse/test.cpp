@@ -31,22 +31,34 @@ int main()
 
 #else
 
+#include <JCGenXML.h>
 #include <CppGen.h>
+
+#include <fstream>
 
 namespace ns = PROJECT_NAMESPACE;
 
 int main()
 {
+	ns::load_serial_format(std::unique_ptr<ns::SerialFormat>{ new ns::JCGenXML{} });
+
 	const auto _input = SOURCE_ROOT "input.xml";
 	const auto _output = SOURCE_ROOT "output.h";
 
-	auto _spec = ns::parse_xml(_input);
+	std::ifstream _ifstr{ _input };
+	auto _spec = ns::parse::parse_xml(_ifstr);
 	if (!_spec)
 	{
 		return (int)_spec.err;
 	};
 
-	return (int)ns::generate(*_spec.value, _output);
+	auto _proc = ns::process(_spec.value);
+	if (!_proc)
+	{
+		return (int)_proc.err;
+	};
+
+	return (int)ns::generate(*_proc.value, _output);
 };
 
 #endif

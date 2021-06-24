@@ -1,6 +1,6 @@
 #include "output.h"
 
-// generated on 2021-06-22 01:56:03.9822781 CDT
+// generated on 2021-06-24 00:11:21.7481377 CDT
 
 #include <pugixml.hpp>
 ::pugi::xml_node building::serialize(::pugi::xml_node _ctx, building _val)

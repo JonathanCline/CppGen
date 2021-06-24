@@ -1,14 +1,9 @@
 #include "CppGen.h"
 
-#include "Parse/XMLParse.h"
-#include "Parse/LuaParse.h"
-
 #include "Generate/SerialFormat.h"
 #include "Generate/GenSpec.h"
 
 #include "Util/Format.h"
-
-#include <pugixml.hpp>
 
 #include <fstream>
 #include <variant>
@@ -125,5 +120,59 @@ namespace PROJECT_NAMESPACE
 		generate_source(_spec, _source, _tabber);
 
 		return error::none;
+	};
+};
+
+namespace PROJECT_NAMESPACE
+{
+	result<GenerationSpecHandle> process(const parse::ParseSpec& _spec)
+	{
+		using error = PROJECT_NAMESPACE::error;
+		result<GenerationSpecHandle> _outResult{};
+		_outResult.err = error::none;
+		_outResult.value = GenerationSpecHandle{ new GenerationSpec{} };
+		
+		auto& _out = *_outResult.value;
+		
+		// This should be auto determined based on which types are used by the ParseSpec
+		_out.include.push_back(IncludeSpec{ .name = "string", .type = IncludeSpec::External });
+		_out.include.push_back(IncludeSpec{ .name = "optional", .type = IncludeSpec::External });
+		// </comment>
+		
+		for (auto& f : _spec.formats)
+		{
+			auto _serial = get_serial_format(f.name);
+			if (_serial)
+			{
+				_out.serial.formats.push_back(_serial);
+			};
+		};
+
+		for (auto& t : _spec.types)
+		{
+			auto& _types = _out.types;
+			
+			TypeSpec _type{};
+			_type.type = t.name;
+			
+			for (auto& v : t.variables)
+			{
+				VariableSpec _var{};
+				_var.name = v.name;
+				_var.type = v.type;
+				_var.value = v.value;
+				_type.members.push_back(std::move(_var));
+			};
+
+			for (auto& f : _out.serial.formats)
+			{
+				_type.functions.push_back(f->gen_serialize(_type));
+				_type.functions.push_back(f->gen_deserialize(_type));
+			};
+
+			_types.push_back(std::move(_type));
+		};
+
+		return _outResult;
 	};
 };

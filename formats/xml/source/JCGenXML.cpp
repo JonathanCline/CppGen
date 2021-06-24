@@ -1,10 +1,14 @@
 #include "JCGenXML.h"
 
+#include <pugixml.hpp>
+
 #include <unordered_map>
 #include <format>
 
 namespace jcgen
 {
+	using format_type = JCGenXML;
+
 	namespace
 	{
 		std::string serialize_direct(const std::string_view& _node, const std::string_view& _var)
@@ -45,7 +49,7 @@ namespace jcgen
 
 
 
-	FunctionBody SerialFormat_XML::gen_serialize_body(const TypeSpec& _type)
+	FunctionBody format_type::gen_serialize_body(const TypeSpec& _type)
 	{
 		const std::string_view _valueName = "_val";
 		const std::string_view _nodeName = "_node";
@@ -75,7 +79,7 @@ namespace jcgen
 		_lines.push_back(std::format("return {};", _nodeName));
 		return _lines;
 	};
-	FunctionBody SerialFormat_XML::gen_deserialize_body(const TypeSpec& _type)
+	FunctionBody format_type::gen_deserialize_body(const TypeSpec& _type)
 	{
 		const std::string_view _nodeName = "_node";
 		const std::string_view _aliasName = "v";
@@ -109,7 +113,7 @@ namespace jcgen
 		return _lines;
 	};
 
-	SerialFormat_XML::SerialFormat_XML() :
+	format_type::JCGenXML() :
 		SerialFormat{ "xml" }
 	{
 		auto& _fmt = *this;
@@ -126,3 +130,60 @@ namespace jcgen
 		_fmt.serial_context_type = _fmt.serial_type;
 	};
 };
+
+
+namespace jcgen::parse
+{
+	ParseResult parse_xml(std::istream& _istr)
+	{
+		ParseResult _outResult{};
+		_outResult.err = _outResult.none;
+
+		pugi::xml_document _xml{};
+		{
+			const auto _goodXML = _xml.load(_istr);
+			if (_goodXML.status != pugi::status_ok)
+			{
+				_outResult.err = _outResult.bad_source_data;
+				return _outResult;
+			};
+		};
+		auto _root = _xml.first_child();
+
+		auto& _out = _outResult.value;
+		{
+			const auto _serialNode = _root.child("serial");
+			auto& _serial = _out.formats;
+			for (auto n : _serialNode)
+			{
+				_serial.push_back(SerialFormatDecl{ n.name() });
+			};
+		};
+
+		for (auto n : _root)
+		{
+			std::string _name = n.name();
+			if (_name == "define")
+			{
+				TypeDecl _type{};
+				_type.name = n.attribute("name").as_string();
+				for (auto fnode : n)
+				{
+					std::string _fnodeName = fnode.name();
+					if (_fnodeName == "var")
+					{
+						VariableDecl _var{};
+						_var.type = fnode.attribute("type").as_string();
+						_var.name = fnode.attribute("name").as_string();
+						_var.value = fnode.text().as_string();
+						_type.variables.push_back(std::move(_var));
+					};
+				};
+				_out.types.push_back(std::move(_type));
+			};
+		};
+
+		return _outResult;
+	};
+};
+

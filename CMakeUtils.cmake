@@ -10,11 +10,12 @@ macro(SUBDIRLIST result curdir)
 endmacro()
 
 
-macro(NEWTEST tname tsource)
+macro(NEWTEST tname tsource ttargetOut)
+	set(${ttargetOut} ${tname}_test)
 	add_executable(${tname}_test ${tsource})
 	target_link_libraries(${tname}_test PUBLIC ${PROJECT_NAME})
 	target_compile_definitions(${tname}_test PRIVATE
-		SOURCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/${tname}/"
+		SOURCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/"
 		PROJECT_NAMESPACE=${lib_namespace})
 	add_test(${tname}_CTest ${tname}_test)
 endmacro(NEWTEST)

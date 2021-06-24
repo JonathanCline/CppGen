@@ -1,27 +1,16 @@
 #include "SerialFormat.h"
 
-#include "Formats/LuaFormat.h"
-
 #include <unordered_map>
 #include <string>
 #include <memory>
 
 namespace PROJECT_NAMESPACE
 {
-
-	namespace
-	{
-		auto make_serial_format_ledger()
-		{
-			std::unordered_map<std::string, std::unique_ptr<SerialFormat>> _out{};
-			_out.insert({ "lua", std::unique_ptr<SerialFormat>{ new SerialFormat_Lua{} } });
-			return _out;
-		};
-	};
+	using FormatLedger = std::unordered_map<std::string, std::unique_ptr<SerialFormat>>;
 
 	auto& serial_format_ledger()
 	{
-		static auto ledger = make_serial_format_ledger();
+		static FormatLedger ledger{};
 		return ledger;
 	};
 

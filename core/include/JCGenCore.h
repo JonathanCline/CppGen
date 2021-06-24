@@ -2,9 +2,35 @@
 
 #include <string>
 #include <vector>
+#include <iosfwd>
+#include <optional>
 
 namespace jcgen
 {
+	enum class error : int
+	{
+		error = -1,
+		none = 0,
+		bad_source_path = 1,
+		bad_source_data = 2
+	};
+
+	template <typename T>
+	struct result
+	{
+		using error_t = jcgen::error;
+		using enum error;
+
+		constexpr explicit operator bool() const noexcept
+		{
+			return this->err == none;
+		};
+
+		T value;
+		error_t err;
+	};
+
+
 	struct VariableSpec
 	{
 		std::string name;
@@ -87,5 +113,41 @@ namespace jcgen
 	private:
 		std::string name_;
 	};
+
+
+
+
+	namespace parse
+	{
+		struct SerialFormatDecl
+		{
+			std::string name;
+		};
+
+		struct VariableDecl
+		{
+			std::string type;
+			std::string name;
+			std::string value; // leave empty if no default was provided
+		};
+
+		struct TypeDecl
+		{
+			std::string name;
+			std::vector<VariableDecl> variables;
+		};
+
+		struct ParseSpec
+		{
+			std::vector<SerialFormatDecl> formats{};
+			std::vector<TypeDecl> types{};
+		};
+
+		using ParseResult = result<ParseSpec>;
+
+		using ParseFunction = ParseResult(*)(std::istream& _istr);
+
+	};
+
 
 };

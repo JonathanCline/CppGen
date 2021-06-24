@@ -20,15 +20,15 @@ add_subdirectory("formats")
 
 
 
-
 add_executable(${PROJECT_NAME}-cli "main.cpp")
 target_link_libraries(${PROJECT_NAME}-cli PUBLIC ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME}-cli PUBLIC PROJECT_NAMESPACE=${lib_namespace}
 	PRIVATE SOURCE_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
-target_link_libraries(${PROJECT_NAME}-cli PRIVATE JCGenXML)
-
+target_link_libraries(${PROJECT_NAME}-cli PRIVATE JCGenXML-static JCGenLua-static)
+target_link_directories(${PROJECT_NAME}-cli PUBLIC "${CMAKE_CURRENT_BUILD_DIR}/formats/xml/")
 
 install(TARGETS ${PROJECT_NAME}-cli DESTINATION "bin")
 install(TARGETS ${PROJECT_NAME} DESTINATION "lib")
 install(FILES "include/${PROJECT_NAME}.h" DESTINATION "include")
+

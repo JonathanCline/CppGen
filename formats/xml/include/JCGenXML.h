@@ -6,12 +6,18 @@
 
 namespace jcgen
 {
-	struct EXPORT_NAME SerialFormat_XML : public SerialFormat
+	EXPORT_NAME struct JCGenXML : public SerialFormat
 	{
 	protected:
 		FunctionBody gen_serialize_body(const TypeSpec& _type) final;
 		FunctionBody gen_deserialize_body(const TypeSpec& _type) final;
 	public:
-		SerialFormat_XML();
+		JCGenXML();
 	};
+
+	namespace parse
+	{
+		EXPORT_NAME ParseResult parse_xml(std::istream& _istr);
+	};
+
 };
